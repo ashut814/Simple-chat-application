@@ -37,21 +37,28 @@ app.post('/send-message', (req, res) => {
     res.redirect('/');
 });
 
-// Contact Us route
-app.get('/contactus', (req, res) => {
+// Contact Us controller
+const contactUsController = (req, res) => {
     res.sendFile(__dirname + '/public/contactus.html');
-});
+};
 
-app.post('/submit-contact', (req, res) => {
+app.get('/contactus', contactUsController);
+
+// Submit Contact controller
+const submitContactController = (req, res) => {
     // Handle form submission (save data to a database, etc.)
     // For simplicity, redirect to /success
     res.redirect('/success');
-});
+};
 
-// Success route
-app.get('/success', (req, res) => {
+app.post('/submit-contact', submitContactController);
+
+// Success controller
+const successController = (req, res) => {
     res.send('Form successfully filled');
-});
+};
+
+app.get('/success', successController);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
