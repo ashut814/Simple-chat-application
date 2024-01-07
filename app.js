@@ -10,6 +10,18 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static('public'));
 
+// Load existing messages from the file
+let messages = loadMessages();
+
+function loadMessages() {
+    try {
+        const data = fs.readFileSync('messages.txt', 'utf8');
+        return data.split('\n').filter(Boolean);
+    } catch (error) {
+        return [];
+    }
+}
+
 // Home route
 app.get('/', (req, res) => {
     const username = req.cookies.username || 'Guest';
@@ -32,10 +44,17 @@ app.post('/send-message', (req, res) => {
     const username = req.cookies.username || 'Guest';
     const message = req.body.message;
 
-    fs.appendFileSync('messages.txt', `${username}: ${message}\n`);
+    messages.push(`${username}: ${message}`);
+
+    // Save messages to the file
+    saveMessages();
 
     res.redirect('/');
 });
+
+function saveMessages() {
+    fs.writeFileSync('messages.txt', messages.join('\n'));
+}
 
 // Contact Us controller
 const contactUsController = (req, res) => {
