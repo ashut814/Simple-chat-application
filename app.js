@@ -24,6 +24,14 @@ app.get('/', (req, res) => {
     res.sendFile(__dirname + '/public/index.html');
 });
 
+// Add this route to app.js
+app.get('/messages', (req, res) => {
+    // Read messages from the file and send as response
+    const messages = fs.readFileSync('messages.txt', 'utf8');
+    res.send(messages);
+});
+
+
 app.post('/send-message', (req, res) => {
     const username = req.cookies.username || 'Guest';
     const message = req.body.message;
