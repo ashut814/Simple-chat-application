@@ -1,45 +1,56 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const fs = require('fs');
 
 const app = express();
 const port = 3000;
 
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(express.static('public'));
 
+// Home route
+app.get('/', (req, res) => {
+    const username = req.cookies.username || 'Guest';
+    res.sendFile(__dirname + '/public/index.html');
+});
+
+// Login route
 app.get('/login', (req, res) => {
     res.sendFile(__dirname + '/public/login.html');
 });
 
 app.post('/login', (req, res) => {
     const username = req.body.username;
-    // Store username in local storage
     res.cookie('username', username);
     res.redirect('/');
 });
 
-app.get('/', (req, res) => {
-    const username = req.cookies.username || 'Guest';
-    res.sendFile(__dirname + '/public/index.html');
-});
-
-// Add this route to app.js
-app.get('/messages', (req, res) => {
-    // Read messages from the file and send as response
-    const messages = fs.readFileSync('messages.txt', 'utf8');
-    res.send(messages);
-});
-
-
+// Messages route
 app.post('/send-message', (req, res) => {
     const username = req.cookies.username || 'Guest';
     const message = req.body.message;
 
-    // Store the message in a file
     fs.appendFileSync('messages.txt', `${username}: ${message}\n`);
 
     res.redirect('/');
+});
+
+// Contact Us route
+app.get('/contactus', (req, res) => {
+    res.sendFile(__dirname + '/public/contactus.html');
+});
+
+app.post('/submit-contact', (req, res) => {
+    // Handle form submission (save data to a database, etc.)
+    // For simplicity, redirect to /success
+    res.redirect('/success');
+});
+
+// Success route
+app.get('/success', (req, res) => {
+    res.send('Form successfully filled');
 });
 
 app.listen(port, () => {
